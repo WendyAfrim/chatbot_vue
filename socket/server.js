@@ -1,4 +1,4 @@
-import { Server } from "socket.io"
+import { Server } from "vue-socket.io"
 
 // On instancie socket.io 
 const io = new Server(3000, {
