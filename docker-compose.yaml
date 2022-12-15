@@ -10,7 +10,7 @@ services:
     ports:
       - 8000:4000
     volumes:
-      - .:/app
+      - ./client:/app
     networks:
       - dev  
   
