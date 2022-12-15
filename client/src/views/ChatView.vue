@@ -1,5 +1,13 @@
+<template>
+    <div id="messages"></div>
+    <form @submit.prevent="socketEmitMessage">
+        <input @input="getUserName" type="text" id="username" placeholder="Entrez votre nom">
+        <input @input="getMessageValue" type="text" id="message" placeholder="Entrez votre message">
+        <button>Envoyer</button>
+    </form>
+</template>
+
 <script setup>
-    import VueSocketIO from 'vue-socket.io'
     import io from 'socket.io-client';
 
     const socket = io("ws://localhost:3000");
@@ -8,35 +16,26 @@
         console.log("Connected to the socket")
     })
 
-    //  on ouvre une connexion socket
-    window.onload = () => {
-        document.querySelector("form").addEventListener('submit', (e) => {
-            e.preventDefault();
-            console.log(e)
 
-            const name = document.querySelector('#name');
-            const message = document.querySelector('#message');
+    function socketEmitMessage(event) {
 
-            socket.emit('chat_message', {name: name.value, message: message.value})
-            document.querySelector('#message').value = '';
+        let username = document.querySelector('#username').value;
+        let message = document.querySelector('#message').value
 
-        }) 
+        if(username && message) {
+            socket.emit('chat_message', {name: username, message: message})
+        }
+    }
 
+    function socketListenToServerResponse() {
         socket.on('chat_message', (msg) => {
             document.querySelector('#messages').innerHTML += `<p>${ msg.name }: ${msg.message}</p>`
         });
-
     }
-</script>
 
-<template>
-    <div id="messages"></div>
-    <form>
-        <input type="text" id="name" placeholder="Entrez votre nom">
-        <input type="text" id="message" placeholder="Entrez votre message">
-        <button>Envoyer</button>
-    </form>
-</template>
+    socketListenToServerResponse();
+
+</script>
 
 <style>
 #messages {
