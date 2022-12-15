@@ -1,40 +1,27 @@
-<script>
-    import { store } from '../store.js'
-    export default {
-        data() {
-            return {
-                store,
-            }
-        }, methods: {
-            redirectToChat() {
-                setTimeout(() => {
-                    window.location.replace("http://localhost:8000/chat");
-                }, 1000)
-            },
-            displayMessageChatIsClosed() {
+<script setup>
+    import { store } from '../store.js';
+    import axios from 'axios'
+
+
+    function getCounselerAvailable() {
+       axios.get('http://localhost:8081/api/users/online', {
+
+       }).then(response => {
+            let data = response.data;
+
+            if(data.length >= 1) {
+                redirectToChat()
+            } else {
                 document.querySelector('.js-chat-closed-display').classList.remove('hide');
-            },
-            chatIsOpen() {
-                const d = new Date();
-                let hour = d.getHours();
-
-                if(hour >= 9 && hour < 15) {
-                    return true;
-                }
-
-                return false;
-            },
-            getCounselerAvailable() {
-                let chatOpen = this.chatIsOpen();
-
-                if(chatOpen) {
-                    this.redirectToChat();
-                } else {
-                    this.displayMessageChatIsClosed();
-                }
             }
-        }
-    }
+       })
+    };
+
+    function redirectToChat() {
+        setTimeout(() => {
+            window.location.replace("http://localhost:8000/chat");
+        }, 1000)
+    };
 </script>
 
 <template>
