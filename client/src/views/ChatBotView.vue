@@ -48,9 +48,6 @@
 </template>
 
 <style>
- body {
-    background: none;
- } 
  #messages-bot {
             border: 0.1em solid black;
             height: 90vh;

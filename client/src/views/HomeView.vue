@@ -1,7 +1,37 @@
 <script setup>
-function getCounselerAvailable() {
-    console.log('hello');
-}
+    function redirectToChat() {
+        setTimeout(() => {
+            window.location.replace("http://localhost:8000/chat");
+        }, 1000)
+    };
+
+    function displayMessageChatIsClosed() {
+        document.querySelector('.js-chat-closed-display').classList.remove('hide');
+    };
+
+    function chatIsOpen() {
+        const d = new Date();
+        let hour = d.getHours();
+
+        if(hour >= 9 && hour < 15) {
+            return true;
+        }
+
+        return false;
+    };
+
+    function getCounselerAvailable() {
+        let chatOpen = chatIsOpen();
+
+        if(chatOpen) {
+            redirectToChat();
+        } else {
+            displayMessageChatIsClosed();
+        }
+    }
+
+
+
 </script>
 
 <template>
