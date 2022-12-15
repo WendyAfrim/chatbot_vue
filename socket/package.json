@@ -1,30 +1,28 @@
 {
-    "name": "chatbotvue",
-    "version": "0.0.0",
-    "private": true,
-    "type": "module",
-    "scripts": {
-      "dev": "vite",
-      "build": "vite build",
-      "preview": "vite preview",
-      "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore",
-      "start:socket": "nodemon ./server.js"
-    },
-    "dependencies": {
-      "nodemon": "^2.0.20",
-      "socket.io-client": "^4.5.4",
-      "vue": "^3.2.45",
-      "vue-router": "^4.1.6",
-      "vue-socket.io": "^3.0.10"
-    },
-    "devDependencies": {
-      "@rushstack/eslint-patch": "^1.1.4",
-      "@vitejs/plugin-vue": "^4.0.0",
-      "@vue/eslint-config-prettier": "^7.0.0",
-      "eslint": "^8.22.0",
-      "eslint-plugin-vue": "^9.3.0",
-      "prettier": "^2.7.1",
-      "vite": "^4.0.1"
-    }
+  "name": "chat_app",
+  "version": "1.0.0",
+  "description": "Chat réalisé avec socket.io",
+  "scripts": {
+    "start:socket": "nodemon ./server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "(https://github.com/WendyAfrim/chat_app.git)"
+  },
+  "type": "module",
+  "keywords": [
+    "chat",
+    "socket",
+    "socket.io",
+    "node",
+    "nodejs"
+  ],
+  "author": "Wendy",
+  "license": "ISC",
+  "dependencies": {
+    "socket.io": "^4.5.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
-  
+}
