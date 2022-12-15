@@ -1,0 +1,44 @@
+version: "3"
+
+services:
+  node:
+    container_name: chatbot_node
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    volumes:
+      - './:/app'
+      - '/app/node_modules'
+    ports:
+      - '8000:8080'
+  
+  postgres:
+    image: postgres:13.2-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - datadb:/var/lib/postgresql/data
+    networks:
+      - dev
+
+  adminer:
+    image: adminer:4.8.1
+    container_name: chatbot_adminer
+    restart: always
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+    environment:
+      ADMINER_DESIGN: nette
+    networks:
+      - dev
+volumes:
+  datadb:
+
+networks:
+  dev:
