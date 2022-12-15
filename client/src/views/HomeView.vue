@@ -1,37 +1,40 @@
-<script setup>
-    function redirectToChat() {
-        setTimeout(() => {
-            window.location.replace("http://localhost:8000/chat");
-        }, 1000)
-    };
+<script>
+    import { store } from '../store.js'
+    export default {
+        data() {
+            return {
+                store,
+            }
+        }, methods: {
+            redirectToChat() {
+                setTimeout(() => {
+                    window.location.replace("http://localhost:8000/chat");
+                }, 1000)
+            },
+            displayMessageChatIsClosed() {
+                document.querySelector('.js-chat-closed-display').classList.remove('hide');
+            },
+            chatIsOpen() {
+                const d = new Date();
+                let hour = d.getHours();
 
-    function displayMessageChatIsClosed() {
-        document.querySelector('.js-chat-closed-display').classList.remove('hide');
-    };
+                if(hour >= 9 && hour < 15) {
+                    return true;
+                }
 
-    function chatIsOpen() {
-        const d = new Date();
-        let hour = d.getHours();
+                return false;
+            },
+            getCounselerAvailable() {
+                let chatOpen = this.chatIsOpen();
 
-        if(hour >= 9 && hour < 15) {
-            return true;
-        }
-
-        return false;
-    };
-
-    function getCounselerAvailable() {
-        let chatOpen = chatIsOpen();
-
-        if(chatOpen) {
-            redirectToChat();
-        } else {
-            displayMessageChatIsClosed();
+                if(chatOpen) {
+                    this.redirectToChat();
+                } else {
+                    this.displayMessageChatIsClosed();
+                }
+            }
         }
     }
-
-
-
 </script>
 
 <template>

@@ -132,3 +132,24 @@ exports.findAllOnline = (req, res) => {
         });
       });
   };
+
+// login
+exports.login = (req, res) => {
+    const email = req.body.email;
+    const password = req.body.password;
+    UserSocket.findOne({ where: { email: email, password: password } })
+      .then(data => {
+        if (data) {
+          res.send(data);
+        } else {
+          res.status(404).send({
+            message: `Cannot find UserSocket with email=${email}.`
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Error retrieving UserSocket with email=" + email
+        });
+      });
+  }
