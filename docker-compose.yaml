@@ -3,14 +3,16 @@ version: "3"
 services:
   node:
     container_name: chatbot_node
-    build:
-      context: ./
-      dockerfile: Dockerfile
-    volumes:
-      - './:/app'
-      - '/app/node_modules'
+    image: node:lts-alpine3.16
+    working_dir: /app
+    tty: true
+    stdin_open: true
     ports:
-      - '8000:80'
+      - 8000:4000
+    volumes:
+      - .:/app
+    networks:
+      - dev  
   
   postgres:
     image: postgres:13.2-alpine
