@@ -1,0 +1,20 @@
+body {
+    min-height: 100vh;
+    background-image: url('https://images.unsplash.com/photo-1558981806-ec527fa84c39?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1770&q=80');
+}
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin: 20em auto;
+} 
+
+.wrapper p {
+    margin-top: 2em;
+    text-align: center;
+}
+
+.hide {
+    display: none;
+}
