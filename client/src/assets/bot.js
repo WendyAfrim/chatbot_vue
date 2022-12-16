@@ -89,7 +89,7 @@ const chatbot = () => {
                 ]
     }
 
-    self.init = (msg) => {
+    self.getAutomaticResponse = (msg) => {
         return self.runChatBot(msg);
     }
 
@@ -158,9 +158,9 @@ const chatbot = () => {
     }
 
     self.runChatBot = (msg) => {
-
         let intent = self.getIntent(msg);
         let response = self.getResponse(intent);
+
         return response;
     }
 

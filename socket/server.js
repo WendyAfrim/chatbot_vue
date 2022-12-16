@@ -17,17 +17,19 @@ io.on('connection', (socket) => {
     })
 
     socket.on("chat_message", (msg) => {
-        //  On relaie le message vers tous les utilisateurs connectés
        io.emit('chat_message', msg);
     })
 
-    socket.on("chatbot_request", (msg) => {
-        //  On relaie le message vers tous les utilisateurs connectés
-       io.emit('chatbot_request', msg);
+    socket.on("chatbot_welcome", (msg) => {
+        io.emit('chatbot_welcome', msg);
+     });
+
+    socket.on("chatbot_user_request", (msg) => {
+       io.emit('chatbot_user_request', msg);
     })
 
     socket.on("chatbot_response", (msg) => {
-        //  On relaie le message vers tous les utilisateurs connectés
-       io.emit('chatbot_response', msg);
-    });
+        io.emit('chatbot_response', msg);
+     })
+
 });
