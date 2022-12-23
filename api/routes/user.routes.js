@@ -5,9 +5,6 @@ module.exports = app => {
   
     // Create a new UserSocket
     router.post("/", users.create);
-
-    // login
-    router.post("/login", users.login);
   
     // Retrieve all UserSocket
     router.get("/", users.findAll);

@@ -1,6 +1,7 @@
 const db = require("../models");
 const UserSocket = db.usersSocket;
 const Op = db.Sequelize.Op;
+const jwt = require("jsonwebtoken");
 
 // Create and Save a new UserSocket
 exports.create = (req, res) => {
@@ -140,11 +141,20 @@ exports.login = (req, res) => {
     UserSocket.findOne({ where: { email: email, password: password } })
       .then(data => {
         if (data) {
-          res.send(data);
-        } else {
-          res.status(404).send({
-            message: `Cannot find UserSocket with email=${email}.`
+          let token = jwt.sign({ id: data.id }, "tokenChat" , {
+            expiresIn: 86400 // 24 hours
           });
+          let user = {
+            id: data.id,
+            name: data.name,
+            email: data.email,
+            role: data.role,
+            online: data.online,
+            token: token
+          }
+          res.send({success: true, user: user});
+        } else {
+          res.send({success: false, message: `Email or password is incorrect.`});
         }
       })
       .catch(err => {

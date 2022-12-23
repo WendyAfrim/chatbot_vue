@@ -1,5 +1,5 @@
 <script setup>
-    import { store } from '../store.js';
+
     import axios from 'axios'
 
 
@@ -24,6 +24,17 @@
         }, 1000)
     };
 </script>
+
+<script>
+    import  { mapGetters } from 'vuex'
+    export default {
+        name: 'HomeView',
+        computed: {
+            ...mapGetters(['user'])
+        }
+    }
+</script>
+
 
 <template>
     <main>
