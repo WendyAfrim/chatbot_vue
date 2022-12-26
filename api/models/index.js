@@ -18,5 +18,6 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.usersSocket = require("./userSocket.model.js")(sequelize, Sequelize);
+db.chatRooms = require('./chatroom.model.js')(sequelize, Sequelize);
 
 module.exports = db;
