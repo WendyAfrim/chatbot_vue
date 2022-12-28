@@ -27,6 +27,7 @@ app.get("/", (req, res) => {
 require("./routes/user.routes.js")(app);
 require("./routes/auth.routes.js")(app);
 require("./routes/chatroom.routes.js")(app);
+require("./routes/appointment.routes.js")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8081;
