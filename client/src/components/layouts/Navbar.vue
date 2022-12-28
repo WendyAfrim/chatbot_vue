@@ -12,4 +12,8 @@
   </nav>
 </template>
 <script></script>
-<style></style>
+<style>
+  .navbar {
+    margin-bottom: 1em;
+  }
+</style>
