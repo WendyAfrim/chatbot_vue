@@ -15,17 +15,24 @@
                     name="name"
                     />
                 </div>
-                <p>{{ test }}</p>
 
                 <div class="form-group">
-                    <label for="type">Type</label>
-                    <input
+                    <label for="capacity">Capacité</label>
+                    <input 
+                    type="number"
                     class="form-control"
-                    id="type"
+                    id="capacity"
                     required
-                    v-model="chatroom.type"
-                    name="type"
+                    v-model="chatroom.capacity"
+                    name="capacity"
                     />
+                </div>
+
+                <div class="form-group">
+
+                    <input type="checkbox" id="open" name="open" checked v-model="chatroom.open">
+                    <label for="open">Ouvert</label>
+
                 </div>
 
                 <button @click="saveChatRoom" class="btn btn-outline-info">Ajouter</button>
@@ -44,21 +51,23 @@
 
     const chatroom = {
         id: null,
-        name: '',
-        type: ''
+        capacity: 0,
+        open: true
     };
 
     function saveChatRoom() {
 
         let data = {
             name: chatroom.name,
-            type: chatroom.type
+            capacity: chatroom.capacity,
+            open: chatroom.open
         }
 
 
         axios.post('http://localhost:8081/api/chatrooms', {
             name: data.name,
-            type: data.type
+            capacity: data.capacity,
+            open: data.open
         })
         .then((response) => {
             if (response.data.success) {
@@ -75,6 +84,10 @@
 </script>
 <style scoped>
     .btn {
+        margin-top: 1em;
+    }
+
+    input {
         margin-top: 1em;
     }
 </style>

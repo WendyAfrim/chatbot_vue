@@ -3,8 +3,8 @@ module.exports = (sequelize, Sequelize) => {
       name: {
         type: Sequelize.STRING
       },
-      type: {
-        type: Sequelize.STRING
+      capacity: {
+        type: Sequelize.SMALLINT
       },
       open: {
         type: Sequelize.BOOLEAN

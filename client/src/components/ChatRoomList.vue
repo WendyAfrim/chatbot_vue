@@ -8,7 +8,7 @@
           <tr>
             <th scope="col">#</th>
             <th scope="col">Nom du salon</th>
-            <th scope="col">Type</th>
+            <th scope="col">Capacité</th>
             <th scope="col">Actif</th>
             <th scope="col">Actions</th>
           </tr>
@@ -17,11 +17,11 @@
           <tr v-for="chatroom in chatrooms">
             <th scope="row">{{ chatroom.id }}</th>
             <td>{{ chatroom.name }}</td>
-            <td>{{ chatroom.type }}</td>
+            <td>{{ chatroom.capacity ?? 'Non défini' }}</td>
             <td>{{ chatroom.open ? 'Oui' : 'Non' }}</td>
             <td>
-              <button class="btn btn-outline-info">Modifier</button>
-              <button class="btn btn-outline-danger">Supprimer</button>
+              <router-link :to="`/admin/chatrooms/${chatroom.id}`" class="btn btn-outline-info">Modifier</router-link>
+              <button class="btn btn-outline-danger" @click="deleteChatroom(chatroom.id)">Supprimer</button>
             </td>
           </tr>
         </tbody>
@@ -52,11 +52,20 @@
           console.log('Err' + error)
         }
       },
+
+      async deleteChatroom(chatroomId) {
+        try {
+          const response = await axios.delete(`http://localhost:8081/api/chatrooms/${chatroomId}`);
+          window.location.reload();
+        } catch(error) {
+          console.log('Err' + error)
+        }
+      }
   },
 
   created() {
-  this.getAllChatrooms();
-   }  
+    this.getAllChatrooms();
+  }  
 
  }
 

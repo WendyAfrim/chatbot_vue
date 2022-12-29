@@ -15,17 +15,17 @@ exports.create = (req, res) => {
     }
 
   
-    // Create a UserSocket
+    // Create a Chatroom
     const chatRoom = {
       name: req.body.name,
-      type: req.body.type,
-      open: true
+      capacity: req.body.capacity,
+      open: req.body.open
     };
   
     // Save UserSocket in the database
     ChatRoom.create(chatRoom)
       .then(data => {
-        res.send(data);
+        res.status(200).send(data);
       })
       .catch(err => {
         res.status(500).send({
@@ -99,6 +99,28 @@ exports.findAll = (req, res) => {
       res.status(500).send({
         message:
           err.message || "Some error occurred while retrieving userSocket."
+      });
+    });
+};
+
+// Find a single Chatroom with an id
+exports.findOneById = (req, res) => {
+  const id = req.params.id;
+
+  ChatRoom.findByPk(id)
+    .then(data => {
+      if (data) {
+        console.log(data)
+        res.send(data);
+      } else {
+        res.status(404).send({
+          message: `Cannot find Chatroom with id=${id}.`
+        });
+      }
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: "Error retrieving Chatroom with id=" + id
       });
     });
 };
