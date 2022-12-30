@@ -2,7 +2,9 @@
 
 import io from 'socket.io-client';
 import chatbot from '../assets/bot.js'
+import axios from 'axios'
 
+    const bot = chatbot();
 
     let self = {};
     const socket = io("ws://localhost:3000");
@@ -20,11 +22,17 @@ import chatbot from '../assets/bot.js'
     }
 
     self.welcomeClient = () => {
-        socket.emit('chatbot_welcome', "Bonjour, je suis un chatbot, que puis-je faire pour vous ?");
+        if (document.querySelector('#messages-bot')) {
+            document.querySelector('#messages-bot').innerHTML = "";
+        } 
 
+        console.log("Welcome client");
+
+        socket.emit('chatbot_welcome', bot.firstResponse());
+        
         socket.on("chatbot_welcome", (msg) => {
             self.displayMessageInTheDom('Chatbot', msg);
-        })   
+        });
     }
 
     self.sendUserRequestToSocket = () => {
@@ -39,7 +47,7 @@ import chatbot from '../assets/bot.js'
     socket.on('chatbot_user_request', (msg) => {
 
         self.displayMessageInTheDom(`${ msg.name }`, `${msg.message}`);
-        let response = chatbot().getAutomaticResponse(msg.message);
+        let response = bot.getAutomaticResponse(msg.message);
 
         socket.emit('chatbot_response', response);
 
@@ -48,18 +56,93 @@ import chatbot from '../assets/bot.js'
     socket.on('chatbot_response', (msg) => {
         self.displayMessageInTheDom('Chatbot', msg);
     });
+    
+    self.getAppointments = (data) => {
+        
+        if (data === undefined) {
+            data = {};
+        }
+        
+        console.log(data);
+        
+        axios.post('http://localhost:8081/api/appointment', data).then((res) => {
+            console.log(res.data);
+            if (res.data.length > 0) {
+                document.querySelector('#'+bot.getAppointmentValidId()).disabled = true;
+                document.querySelector('#'+bot.getAppointmentMessageId()).innerHTML = "Il n'y a plus de rendez-vous disponible à cette date et à cette heure";
+                document.querySelector('#'+bot.getAppointmentMessageId()).style.display = "";
+            } else {
+                document.querySelector('#'+bot.getAppointmentValidId()).disabled = false;
+                document.querySelector('#'+bot.getAppointmentMessageId()).innerHTML = "";
+                document.querySelector('#'+bot.getAppointmentMessageId()).style.display = "none";
+            }
+            return res.data;
+        }).catch((err) => {
+            console.log(err);
+            return {error: err}
+        })
+    }
 
     self.displayMessageInTheDom = (persona, msg) => {
-        
         if('Chatbot' === persona) {
             setTimeout(() => {
                 document.querySelector('#messages-bot').innerHTML += `<p> ${ persona } : ${ msg }</p>`
-            }, 2000)
+                
+                if (bot.getStateIntent() == "Stop") {
+                    setTimeout(() => {
+                        self.welcomeClient();
+                    }, 1000)
+                }
+
+                if (bot.getAppointmentDateId() !== "" && bot.getAppointmentTimeId() !== "") {
+                    
+                    document.querySelector('#'+bot.getAppointmentDateId()).addEventListener('change', (e) => {
+                        let date = e.target.value;
+                        let time = document.querySelector('#'+bot.getAppointmentTimeId()).value;
+
+                        if (time != "") {
+                            self.getAppointments({date: date, time: time});
+                        }
+                    })
+                    
+                    document.querySelector('#'+bot.getAppointmentTimeId()).addEventListener('change', (e) => {
+                        let time = e.target.value;
+                        let date = document.querySelector('#'+bot.getAppointmentDateId()).value;
+                        
+                        if (date != "") {
+                            self.getAppointments({date: date, time: time});
+                        }
+                    })
+
+                    document.querySelector('#'+bot.getAppointmentValidId()).addEventListener('click', (e) => {
+                        e.preventDefault();
+                        let date = document.querySelector('#'+bot.getAppointmentDateId()).value;
+                        let time = document.querySelector('#'+bot.getAppointmentTimeId()).value;
+
+                        axios.post("http://localhost:8081/api/appointment/create", {date: date, time: time, type: bot.getStateIntent()}).then((res) => {
+                            console.log(res.data);
+                            document.querySelector('#'+bot.getAppointmentMessageId()).innerHTML = "Votre rendez-vous a bien été pris";
+                        }).catch((err) => {
+                            console.log(err);
+                            document.querySelector('#'+bot.getAppointmentMessageId()).innerHTML = "Une erreur est survenue lors de la prise de rendez-vous";                            
+                        }).finally(() => {
+                            self.welcomeClient();
+                        })
+                        console.log(date);
+                    })
+
+                    if (document.querySelector('#'+bot.getAppointmentDateId()).value !== "" && document.querySelector('#'+bot.getAppointmentTimeId().value == "").value !== null) {
+                        document.querySelector('#'+bot.getAppointmentValidId()).disabled = false;                    
+                    } else {
+                        document.querySelector('#'+bot.getAppointmentValidId()).disabled = true;
+                    }
+                }
+
+            }, 500)
         } else {
             document.querySelector('#messages-bot').innerHTML += `<p> ${ persona } : ${ msg }</p>`
         }
-
-    }
+    }    
 
     self.init();
 </script>

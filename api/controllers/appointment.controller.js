@@ -7,7 +7,7 @@ const Op = db.Sequelize.Op;
 exports.create = (req, res) => {
 
     // Validate request
-    if (!req.body.name) {
+    if (!req.body.date || !req.body.time || !req.body.type) {
       res.status(400).send({
         message: "Content can not be empty!"
       });
@@ -20,7 +20,6 @@ exports.create = (req, res) => {
       date: req.body.date,
       time: req.body.time,
       type: req.body.type,
-      status: req.body.status
     };
   
     // Save Appointment in the database
@@ -90,8 +89,18 @@ exports.delete = (req, res) => {
 
 // Retrieve all Appointment from the database.
 exports.findAll = (req, res) => {
-  const name = req.query.name;
-  var condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
+  const type = req.body.type;
+  const date = req.body.date;
+  const time = req.body.time;
+  var conditionType = type ? { type: { [Op.like]: `%${type}%` } } : null;
+  var conditionDate = date ? { date: { [Op.gte]: date } }: null;
+  var conditionTime = time ? { time: { [Op.gte]: time } }: null;
+  var conditionArray = [];
+  if (conditionType) conditionArray.push(conditionType);
+  if (conditionDate) conditionArray.push(conditionDate);
+  if (conditionTime) conditionArray.push(conditionTime);
+
+  var condition =  {[Op.and]: conditionArray} ;
   Appointment.findAll({ where: condition })
     .then(data => {
       res.send(data);

@@ -1,8 +1,42 @@
 let stateIntent = "";
 let stateResponse = "";
+let appointmentDateId = "";
+let appointmentTimeId = "";
+let appointmentValidId = "";
+let appointmentMessageId = "";
 
 const chatbot = () => {
     let self = {};
+
+    self.firstResponse = () => {
+        stateIntent = "";
+        stateResponse = "";
+        return "Bonjour, je suis un chatbot, que puis-je faire pour vous ?";
+    }
+
+    self.getStateIntent = () => {
+        return stateIntent;
+    }
+
+    self.getStateResponse = () => {
+        return stateResponse;
+    }
+
+    self.getAppointmentDateId = () => {
+        return appointmentDateId;
+    }
+
+    self.getAppointmentTimeId = () => {
+        return appointmentTimeId;
+    }
+
+    self.getAppointmentValidId = () => {
+        return appointmentValidId;
+    }
+
+    self.getAppointmentMessageId = () => {
+        return appointmentMessageId;
+    }
 
     let stopIntent = {
         "name": "Stop",
@@ -198,7 +232,7 @@ const chatbot = () => {
                 break;
             case "Stop":
                 response = "Au revoir";
-                stateIntent = "";
+                stateIntent = "Stop";
                 break;
             case "Hello":
                 response = "Bonjour, je suis le chatbot de Groupemoto,\n je peux vous aider à prendre un rendez-vous pour un entretien de votre véhicule ou à trouver des informations sur nos véhicules";
@@ -223,7 +257,7 @@ const chatbot = () => {
                 let yearNow = new Date().getFullYear();
                 console.log(yearNow, parseInt(msg), msg);
                 if (parseInt(msg) < yearNow - 1) {
-                    response = self.appointment(msg);
+                    response = self.appointment(intent.name, 'appointment servicing');
                 } else {
                     response = "Quelle est le nombre de kilomètres parcourus depuis le dernier entretien ?";
                     stateResponse = "Servicing motorcycle : km";
@@ -231,7 +265,7 @@ const chatbot = () => {
                 break;
             case "Servicing motorcycle : km":
                 if (parseInt(msg) > 10000) {
-                    response = self.appointment(msg);
+                    response = self.appointment(intent.name, 'appointment servicing');
                 } else {
                     response = "Votre moto n'a pas besoin d'entretien pour le moment, voulez-vous prendre un rendez-vous pour une révision ?";
                     stateResponse = "Servicing motorcycle : review request";
@@ -239,7 +273,7 @@ const chatbot = () => {
                 break;
             case "Servicing motorcycle : review request":
                 if (msg.match(/oui/gi)) {
-                    response = self.appointment(msg);
+                    response = self.appointment(intent.name, 'appointment review');
                 } else {
                     response = "Au revoir";
                     stateResponse = "";
@@ -253,12 +287,27 @@ const chatbot = () => {
         return response;
     }
 
-
     // create appointment response
-    self.appointment = (msg) => {
-        console.log("appointment");
-        stateResponse = "Entretien moto : appointment";
-        return "Pour prendre un rendez-vous, veuillez nous contacter au 01 23 45 67 89";
+    self.appointment = (intent, response) => {
+        stateResponse = `${intent} : ${response}`;
+
+        const dateNow = new Date();
+
+        let formatResponse = response.replace(/ /g, '-');
+
+        appointmentDateId = `appointment-date-${formatResponse}`;
+
+        appointmentTimeId = `appointment-time-${formatResponse}`;
+
+        appointmentMessageId = `appointment-message-${formatResponse}`;
+
+        appointmentValidId = `validate-${formatResponse}`;
+
+        return `Choisissez une date pour votre rendez-vous : 
+                <input id="${appointmentDateId}" style="background-color:white" type='date' min='${dateNow.getFullYear}-${dateNow.getMonth}-${dateNow.getDay}'> 
+                <input id="${appointmentTimeId}" style="background-color:white" type='time' min='09:00' max='18:00'>
+                <button id="${appointmentValidId}" style="background-color:white">Valider</button>
+                <span id="${appointmentMessageId}" style="background-color:darkorange; color:white; padding:5px; border-radius:7px; display:none;" ></span>`;
     }
 
     return self;
