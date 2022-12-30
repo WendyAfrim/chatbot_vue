@@ -41,7 +41,9 @@
         <div class="wrapper">
             <div class="home-actions">
                 <span @click="getCounselerAvailable()" class="btn btn-light btn-action js-chat-target-counseler">Je souhaite parler <br> à un conseiller de vente</span>
-                <span class="btn-action">Je souhaite rejoindre un salon</span>
+                <RouterLink :to="'/chatrooms'">
+                    <span class="btn-action">Je souhaite rejoindre un salon</span>
+                </RouterLink>
             </div>
             
             <div class="chatbot">

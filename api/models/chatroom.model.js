@@ -6,6 +6,12 @@ module.exports = (sequelize, Sequelize) => {
       capacity: {
         type: Sequelize.SMALLINT
       },
+      state: {
+        type: Sequelize.STRING
+      },
+      numberOfguests: {
+        type: Sequelize.SMALLINT
+      },
       open: {
         type: Sequelize.BOOLEAN
       },

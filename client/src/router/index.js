@@ -3,9 +3,10 @@ import HomeView from "../views/HomeView.vue";
 import ChatView from "../views/ChatView.vue";
 import ChatBotView from "../views/ChatBotView.vue";
 import LoginView from "../views/LoginView.vue";
-import ChatRoomList from "../components/ChatRoomList.vue";
-import ChatRoom from "../components/ChatRoom.vue";
-import AddChatRoom from "../components/AddChatRoom.vue";
+import JoinChatRoom from "../components/front/JoinChatRoom.vue";
+import ChatRoomList from "../components/admin/ChatRoomList.vue";
+import ChatRoom from "../components/admin/ChatRoom.vue";
+import AddChatRoom from "../components/admin/AddChatRoom.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -29,6 +30,11 @@ const router = createRouter({
       path: "/login",
       name: "login",
       component: LoginView,
+    },
+    {
+      path: "/chatrooms",
+      name: "chatrooms",
+      component: JoinChatRoom,
     },
     {
       path: "/admin/chatrooms",
