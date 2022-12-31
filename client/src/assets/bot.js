@@ -46,6 +46,7 @@ const chatbot = () => {
         return intent;
     }
 
+    // add list of responses
     self.getResponse = (intent, msg) => {
         let response = null;
        
@@ -59,6 +60,9 @@ const chatbot = () => {
             case "Info motorcycle":
                 response = self.getInfoMotorcycleResponse(intent, msg);
                 break;
+            case "Info contact":
+                response = self.getInfoContactResponse(intent, msg);
+                break;
             default:
                 response = self.getBasicResponse(intent);
                 break;
@@ -68,6 +72,7 @@ const chatbot = () => {
 
     }
 
+    // add list of intents
     self.runChatBot = (msg) => {
         
         let intentList = [];
@@ -81,6 +86,9 @@ const chatbot = () => {
                 break;
             case "Info motorcycle":
                 intentList = self.getInfoMotorcycleIntent();
+                break;
+            case "Info contact":
+                intentList = self.getInfoContactIntent();
                 break;
             default:
                 intentList = self.getBasicIntent();
@@ -241,6 +249,27 @@ const chatbot = () => {
         return [infoMotorcycleIntent, ...self.getDefaultIntent()];
     }
 
+    self.getInfoContactIntent = () => {
+        let infoContactIntent = {
+            "name": "Info contact",
+            "Regex": []
+        }
+
+        switch (stateResponse) {
+            case "":
+                infoContactIntent.name = "Info contact : contact type";
+                // regex pour le type de contact
+                infoContactIntent.Regex.push(/(.*)téléphone(.*)/);
+                infoContactIntent.Regex.push(/(.*)tel(.*)/);
+                infoContactIntent.Regex.push(/(.*)tél(.*)/);
+                infoContactIntent.Regex.push(/(.*)email(.*)/);
+                infoContactIntent.Regex.push(/(.*)adresse(.*)/);
+                break;
+        }
+
+        return [infoContactIntent, ...self.getDefaultIntent()];
+    }
+
     //  Differents responses
 
     self.getDefaultResponse = (intent) => {
@@ -272,7 +301,7 @@ const chatbot = () => {
                 stateIntent = "Info motorcycle";
                 break;
             case "Info contact":
-                response = "Vous pouvez nous contacter au 01 23 45 67 89 ou par email à contact@groupemoto.fr";
+                response = "Vous voulez nous contacter par téléphone ou par email ?";
                 stateIntent = "Info contact";
                 break;
             case "Hello":
@@ -351,6 +380,27 @@ const chatbot = () => {
                     response = "D'accord, au revoir";
                     stateIntent = "Stop";
                 }
+                break;
+            default:
+                response = self.getDefaultResponse(intent);
+                break;
+        }
+
+        return response;
+    }
+
+    self.getInfoContactResponse = (intent, msg) => {
+        let response = null;
+
+        switch (intent.name) {
+            case "Info contact : contact type":
+                if (msg.match(/(.*)tel(.*)/) || msg.match(/(.*)tél(.*)/)) {
+                    response = "Voici notre numéro de téléphone : 01 23 45 67 89";
+                }
+                else {
+                    response = "Voici notre adresse email : contact@groupemoto.fr";
+                }
+                stateIntent = "Stop";
                 break;
             default:
                 response = self.getDefaultResponse(intent);
