@@ -293,7 +293,7 @@ const chatbot = () => {
 
         switch (intent.name) {
             case "Servicing motorcycle":
-                response = "D'accord, quelle est l'année de votre moto ?";
+                response = "D'accord, votre moto date de quelle année ?";
                 stateIntent = "Servicing motorcycle";
                 break;
             case "Info motorcycle":
@@ -320,7 +320,7 @@ const chatbot = () => {
 
         switch (intent.name) {
             case "Servicing motorcycle : motorcycle year":
-                response = "Quelle est la date de votre dernier entretien ?"; 
+                response = "En quelle année avez-vous fait votre dernier entretien ?"; 
                 stateResponse = "Servicing motorcycle : last servicing year"; 
                 break;
             case "Servicing motorcycle : last servicing year":
@@ -345,9 +345,8 @@ const chatbot = () => {
                 if (msg.match(/oui/gi)) {
                     response = self.appointment(intent.name, 'appointment review');
                 } else {
-                    response = "Au revoir";
-                    stateResponse = "";
-                    stateIntent = "";
+                    response = "D'accord, au revoir";
+                    stateIntent = "Stop";
                 }
             default:
                 response = self.getDefaultResponse(intent);
