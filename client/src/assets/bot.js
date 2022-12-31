@@ -1,5 +1,9 @@
 let stateIntent = ""; // val : "", "Servicing motorcycle", "Info motorcycle", "Info contact", "Stop"
 let stateResponse = "";
+
+// Servicing motorcycle
+let servicingMotorcycleYear = "";
+
 // appointment
 let appointmentDateId = "";
 let appointmentTimeId = "";
@@ -201,15 +205,13 @@ const chatbot = () => {
             case "Servicing motorcycle : last servicing year":
                 servicingMotorcycleIntent.name = "Servicing motorcycle : last servicing year";
                 // regex pour l'année de l'entretien
-                servicingMotorcycleIntent.Regex.push(/(.*)[0-9]{4}(.*)/);
+                servicingMotorcycleIntent.Regex.push(/(.*)[0-9]{4}(.*)/g);
                 break;
             case "Servicing motorcycle : appointment":
                 servicingMotorcycleIntent.name = "Entretien moto : appointment";
-                // regex pour le appointment
-                servicingMotorcycleIntent.Regex.push(/(.*)[0-9]{2}\/[0-9]{2}\/[0-9]{4}(.*)/);
                 break;
             case "Servicing motorcycle : km":
-                servicingMotorcycleIntent.name = "Entretien moto : km";
+                servicingMotorcycleIntent.name = "Servicing motorcycle : km";
                 // regex pour le km
                 servicingMotorcycleIntent.Regex.push(/(.*)[0-9](.*)/);
                 break;
@@ -317,16 +319,30 @@ const chatbot = () => {
 
     self.getServicingResponse = (intent, msg) => {
         let response = null;
+        let yearNow = new Date().getFullYear();
 
         switch (intent.name) {
             case "Servicing motorcycle : motorcycle year":
-                response = "En quelle année avez-vous fait votre dernier entretien ?"; 
-                stateResponse = "Servicing motorcycle : last servicing year"; 
-                break;
+                msg = msg.replace(/[^0-9]/g, '');
+                
+                if (parseInt(msg) > yearNow || parseInt(msg) < 1970) {
+                    response = "Veuillez entrer une année valide";
+                } else {
+                    servicingMotorcycleYear = msg;
+                    response = "En quelle année avez-vous fait votre dernier entretien ?"; 
+                    stateResponse = "Servicing motorcycle : last servicing year"; 
+                }
+                break;   
             case "Servicing motorcycle : last servicing year":
-                let yearNow = new Date().getFullYear();
-                console.log(yearNow, parseInt(msg), msg);
-                if (parseInt(msg) < yearNow - 1) {
+                yearNow = new Date().getFullYear();
+
+                msg = msg.replace(/[^0-9]/g, '');
+                
+                if (parseInt(msg) > yearNow || parseInt(msg) < 1970) {
+                    response = "Veuillez entrer une année valide";
+                } else if (parseInt(msg) < servicingMotorcycleYear) { 
+                    response = "Vous ne pouvez pas avoir fait votre dernier entretien avant l'année de votre moto, veuillez entrer une année valide";
+                } else if (parseInt(msg) < yearNow - 1) {
                     response = self.appointment(intent.name, 'appointment servicing');
                 } else {
                     response = "Quelle est le nombre de kilomètres parcourus depuis le dernier entretien ?";
@@ -348,6 +364,7 @@ const chatbot = () => {
                     response = "D'accord, au revoir";
                     stateIntent = "Stop";
                 }
+                break;
             default:
                 response = self.getDefaultResponse(intent);
                 break;
