@@ -1,55 +1,21 @@
-let stateIntent = "";
+let stateIntent = ""; // val : "", "Servicing motorcycle", "Info motorcycle", "Info contact", "Stop"
 let stateResponse = "";
+// appointment
 let appointmentDateId = "";
 let appointmentTimeId = "";
 let appointmentValidId = "";
 let appointmentMessageId = "";
+let appointmentType = "";
+// info motorcycle
+let infoMotorcycleType = "";
 
 const chatbot = () => {
     let self = {};
 
-    self.firstResponse = () => {
-        stateIntent = "";
-        stateResponse = "";
-        return "Bonjour, je suis un chatbot, que puis-je faire pour vous ?";
-    }
+    // default vars
+    self.dontUnderstand = "Je ne comprends pas votre demande, pouvez-vous reformuler ?";
 
-    self.getStateIntent = () => {
-        return stateIntent;
-    }
-
-    self.getStateResponse = () => {
-        return stateResponse;
-    }
-
-    self.getAppointmentDateId = () => {
-        return appointmentDateId;
-    }
-
-    self.getAppointmentTimeId = () => {
-        return appointmentTimeId;
-    }
-
-    self.getAppointmentValidId = () => {
-        return appointmentValidId;
-    }
-
-    self.getAppointmentMessageId = () => {
-        return appointmentMessageId;
-    }
-
-    let stopIntent = {
-        "name": "Stop",
-        "Regex": [ /(.*)arreter(.*)/,
-                    /(.*)arrêter(.*)/,
-                    /(.*)quitter(.*)/,
-                    /(.*)stop(.*)/,
-                    /(.*)fin(.*)/,
-                    /(.*)annuler(.*)/,
-                    
-                ]
-    }
-
+    // run chatbot
     self.getAutomaticResponse = (msg) => {
         return self.runChatBot(msg);
     }
@@ -90,6 +56,9 @@ const chatbot = () => {
             case "Servicing motorcycle":
                 response = self.getServicingResponse(intent, msg);
                 break;
+            case "Info motorcycle":
+                response = self.getInfoMotorcycleResponse(intent, msg);
+                break;
             default:
                 response = self.getBasicResponse(intent);
                 break;
@@ -110,6 +79,9 @@ const chatbot = () => {
             case "Servicing motorcycle":
                 intentList = self.getServicingIntent();
                 break;
+            case "Info motorcycle":
+                intentList = self.getInfoMotorcycleIntent();
+                break;
             default:
                 intentList = self.getBasicIntent();
                 break;
@@ -121,8 +93,39 @@ const chatbot = () => {
         return response;
     }
 
+    self.firstResponse = () => {
+        stateIntent = "";
+        stateResponse = "";
+
+        appointmentDateId = "";
+        appointmentTimeId = "";
+        appointmentValidId = "";
+        appointmentMessageId = "";
+        appointmentType = "";
+
+        infoMotorcycleType = "";
+
+        return "Bonjour, je suis un chatbot, que puis-je faire pour vous ?";
+    }
 
     //  Differents intents
+
+    self.getDefaultIntent = () => {
+        let stopIntent = {
+            "name": "Stop",
+            "Regex": [ /(.*)arreter(.*)/,
+                        /(.*)arrêter(.*)/,
+                        /(.*)quitter(.*)/,
+                        /(.*)stop(.*)/,
+                        /(.*)fin(.*)/,
+                        /(.*)annuler(.*)/,
+                        
+                    ]
+        }
+
+        return [stopIntent];
+    }
+
     self.getBasicIntent = () => {
 
         let helloIntent = {
@@ -173,7 +176,7 @@ const chatbot = () => {
                     ]
         }
 
-        return [helloIntent, servicingIntent, infoMotorcycleIntent, infoContactIntent, stopIntent];
+        return [helloIntent, servicingIntent, infoMotorcycleIntent, infoContactIntent, ...self.getDefaultIntent()];
     }
 
     self.getServicingIntent = () => {
@@ -209,11 +212,53 @@ const chatbot = () => {
                 servicingMotorcycleIntent.Regex.push(/(.*)non(.*)/);
                 break;
         }
-        return [servicingMotorcycleIntent, stopIntent];
+        return [servicingMotorcycleIntent, ...self.getDefaultIntent()];
     }
 
+    self.getInfoMotorcycleIntent = () => {
+        let infoMotorcycleIntent = {
+            "name": "Info motorcycle",
+            "Regex": []
+        }
+
+        switch (stateResponse) {
+            case "":
+                infoMotorcycleIntent.name = "Info motorcycle : motorcycle type";
+                // regex pour le type de moto
+                infoMotorcycleIntent.Regex.push(/(.*)routier(.*)/);
+                infoMotorcycleIntent.Regex.push(/(.*)tout terrain(.*)/);
+                infoMotorcycleIntent.Regex.push(/(.*)tout-terrain(.*)/);
+                infoMotorcycleIntent.Regex.push(/(.*)sportif(.*)/);
+                break;
+            case "Info motorcycle : test request":
+                infoMotorcycleIntent.name = "Info motorcycle : test request";
+                // regex pour la demande de test
+                infoMotorcycleIntent.Regex.push(/(.*)oui(.*)/);
+                infoMotorcycleIntent.Regex.push(/(.*)non(.*)/);
+                break;
+        }
+
+        return [infoMotorcycleIntent, ...self.getDefaultIntent()];
+    }
 
     //  Differents responses
+
+    self.getDefaultResponse = (intent) => {
+        let response = null;
+
+        switch (intent.name) {
+            case "Stop":
+                response = "Au revoir";
+                stateIntent = "Stop";
+                break;
+            default:
+                response = self.dontUnderstand;
+                break;
+        }
+
+        return response;
+    }
+
     self.getBasicResponse = (intent) => {
         let response = null;
 
@@ -223,22 +268,18 @@ const chatbot = () => {
                 stateIntent = "Servicing motorcycle";
                 break;
             case "Info motorcycle":
-                response = "Vous pouvez trouver toutes les informations sur nos véhicules sur notre site internet";
+                response = "D'accord, quel type d'usage faites-vous de votre moto ? (routier, tout terrain ou sportif)";
                 stateIntent = "Info motorcycle";
                 break;
             case "Info contact":
                 response = "Vous pouvez nous contacter au 01 23 45 67 89 ou par email à contact@groupemoto.fr";
                 stateIntent = "Info contact";
                 break;
-            case "Stop":
-                response = "Au revoir";
-                stateIntent = "Stop";
-                break;
             case "Hello":
                 response = "Bonjour, je suis le chatbot de Groupemoto,\n je peux vous aider à prendre un rendez-vous pour un entretien de votre véhicule ou à trouver des informations sur nos véhicules";
                 break;
             default:
-                response = "Je n'ai pas compris votre demande";
+                response = self.getDefaultResponse(intent);
                 break;
         }
 
@@ -280,7 +321,39 @@ const chatbot = () => {
                     stateIntent = "";
                 }
             default:
-                response = "Je n'ai pas compris votre demande";
+                response = self.getDefaultResponse(intent);
+                break;
+        }
+
+        return response;
+    }
+
+    self.getInfoMotorcycleResponse = (intent, msg) => {
+        let response = null;
+
+        switch (intent.name) {
+            case "Info motorcycle : motorcycle type":
+                if (msg.match(/(.*)routier(.*)/)) {
+                    infoMotorcycleType = "routier";
+                } else if (msg.match(/(.*)tout terrain(.*)/) || msg.match(/(.*)tout-terrain(.*)/)) {
+                    infoMotorcycleType = "tout terrain";
+                } else if (msg.match(/(.*)sportif(.*)/)) {
+                    infoMotorcycleType = "sportif";
+                }
+
+                response = `Voulez-vous prendre un rendez-vous pour un essai ${infoMotorcycleType} ?`;
+                stateResponse = "Info motorcycle : test request";
+                break;
+            case "Info motorcycle : test request":
+                if (msg.match(/oui/gi)) {
+                    response = self.appointment(intent.name, `appointment test ${infoMotorcycleType}`);
+                } else {
+                    response = "D'accord, au revoir";
+                    stateIntent = "Stop";
+                }
+                break;
+            default:
+                response = self.getDefaultResponse(intent);
                 break;
         }
 
@@ -290,6 +363,8 @@ const chatbot = () => {
     // create appointment response
     self.appointment = (intent, response) => {
         stateResponse = `${intent} : ${response}`;
+
+        appointmentType = response;
 
         const dateNow = new Date();
 
@@ -308,6 +383,35 @@ const chatbot = () => {
                 <input id="${appointmentTimeId}" style="background-color:white" type='time' min='09:00' max='18:00'>
                 <button id="${appointmentValidId}" style="background-color:white">Valider</button>
                 <span id="${appointmentMessageId}" style="background-color:darkorange; color:white; padding:5px; border-radius:7px; display:none;" ></span>`;
+    }
+
+    // getters 
+    self.getStateIntent = () => {
+        return stateIntent;
+    }
+
+    self.getStateResponse = () => {
+        return stateResponse;
+    }
+
+    self.getAppointmentType = () => {
+        return appointmentType;
+    }
+
+    self.getAppointmentDateId = () => {
+        return appointmentDateId;
+    }
+
+    self.getAppointmentTimeId = () => {
+        return appointmentTimeId;
+    }
+
+    self.getAppointmentValidId = () => {
+        return appointmentValidId;
+    }
+
+    self.getAppointmentMessageId = () => {
+        return appointmentMessageId;
     }
 
     return self;
