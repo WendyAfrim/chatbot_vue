@@ -9,9 +9,6 @@ module.exports = (sequelize, Sequelize) => {
       type: {
         type: Sequelize.STRING
       },
-      status: {
-        type: Sequelize.STRING
-      },
     });
   
     return Appointment;

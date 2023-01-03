@@ -4,10 +4,10 @@ module.exports = app => {
     var router = require("express").Router();
   
     // Create a new ChatRoom
-    router.post("/", appointment.create);
+    router.post("/create", appointment.create);
 
     // Retrieve all ChatRoom
-    router.get("/", appointment.findAll);
+    router.post("/", appointment.findAll);
   
     // Update a ChatRoom with id
     router.put("/:id", appointment.update);
