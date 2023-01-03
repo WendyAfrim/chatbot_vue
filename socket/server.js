@@ -1,4 +1,5 @@
 import { Server } from "socket.io"
+import axios from 'axios'
 
 // On instancie socket.io 
 const io = new Server(3000, {
@@ -16,7 +17,39 @@ io.on('connection', (socket) => {
         console.log('Deconnexion');
     })
 
+    socket.on('enter_room', (room) => {
+        socket.join(room);
+        console.log(socket.rooms);
+    });
+
+    socket.on('leave_room', (room) => {
+        socket.leave(room);
+    });
+
     socket.on("chat_message", (msg) => {
+
+        // const message = ChatDataService.create({
+        //     name: msg.name,
+        //     message: msg.message,
+        //     chatroom: msg.room,
+        //     createdAt: msg.date
+        // }).then(() => {
+        //     io.in(msg.room).emit('received_message', msg);
+        // }).catch(e => {
+        //     console.log(e);
+        // });
+
+        axios.post('http://localhost:8081/api/chats', {
+            name: msg.name,
+            message: msg.message,
+            chatroom: msg.room,
+            createdAt: msg.date
+        }).then(() => {
+            io.in(msg.room).emit('received_message', msg);
+        }).catch(e => {
+            console.log(e);
+        });
+
        io.emit('chat_message', msg);
     })
 
