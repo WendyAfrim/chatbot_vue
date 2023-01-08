@@ -9,5 +9,8 @@ module.exports = app => {
     // Retrieve all chat
     router.get("/", chat.findAll);
 
+    // Retrieve all message by room
+    router.get("/room/:room", chat.findByRoom);
+
     app.use('/api/chats', router);
   };

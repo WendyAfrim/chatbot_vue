@@ -15,12 +15,12 @@
     <main>
         <div id="content">
             <div id="messages"></div>
-            <div id="writing">Wendy écrit un message</div>
+            <div id="writing"></div>
         </div>
 
         <form @submit.prevent="socketEmitMessage">
-            <input @input="getUserName" type="text" id="username" placeholder="Entrez votre nom">
-            <input @input="getMessageValue" type="text" id="message" placeholder="Entrez votre message">
+            <input type="text" id="username" placeholder="Entrez votre nom">
+            <input type="text" id="message" placeholder="Entrez votre message">
             <button>Envoyer</button>
         </form>
     </main>
@@ -57,21 +57,17 @@
                 let room = document.querySelector('#tabs li.active').dataset.room;
                 let createdAt = new Date();
 
+                console.log(room);
+
                 if(username && message) {
                     this.socket.emit('chat_message', {
                         name: username, 
                         message: message,
-                        room: room,
+                        chatroom: room,
                         date: createdAt
                     })
                 }
 
-            },
-
-            socketListenToServerResponse() {
-                this.socket.on('received_message', (msg) => {
-                    document.querySelector('#messages').innerHTML += `<p>${ msg.name }: ${msg.message}</p>`
-                });
             },
 
             async getAllChatrooms(){
@@ -95,16 +91,42 @@
 
                     document.querySelector('#messages').innerHTML = "";
 
-                    console.log(activeElement.dataset.room);
                     this.socket.emit('leave_room', activeElement.dataset.room)
                     this.socket.emit('enter_room', roomName);
                 }
-            }
+            }, 
+
+            socketListenToServerResponse() {
+                this.socket.on('received_message', (msg) => {
+                    this.publishMessages(msg);
+                });
+            },
+
+
+            socketListenInitMessages() {
+                this.socket.on('init_messages', (msg) => {
+                    let data = msg.messages
+
+                    if(data !== []) {
+                        data.forEach(message => {
+                            this.publishMessages(message);
+                        })
+                    }
+                });
+            },
+
+            publishMessages(msg) {
+                let created = new Date(msg.createdAt);
+                let text = `<div style="margin-bottom: 3em;"><p">${ msg.name } <small> ${created.toLocaleDateString()}</small></p><p> ${msg.message}</p></div>`;
+                document.querySelector('#messages').innerHTML += text
+            },
+
         }, 
 
         created() {
 
             this.socketListenToServerResponse();
+            this.socketListenInitMessages();
             this.getAllChatrooms();
         }
     }
@@ -164,34 +186,30 @@ main {
     width: 75em;
 }
 
-    #messages p {
-        margin: 0;
-        padding: 10px;
-    }
+ 
+.message {
+    margin-top: 3em;
+}
 
-    #messages :nth-child(odd) {
-        background-color: #aaa;
-    }
+form {
+    display: flex;
+}
 
-    form {
-        display: flex;
-    }
+#name {
+    flex: 1;
+    padding: 10px;
+}
 
-    #name {
-        flex: 1;
-        padding: 10px;
-    }
+#message {
+    flex: 5;
+    padding: 10px;
+}
 
-    #message {
-        flex: 5;
-        padding: 10px;
-    }
-
-    button {
-        flex: 1;
-        padding: 10px;
-        border: none;
-        cursor: pointer;
-        background-color: #eee;
-    }
+button {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: rgb(126, 184, 127);
+}
 </style>

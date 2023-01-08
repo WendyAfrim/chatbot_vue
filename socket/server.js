@@ -19,7 +19,19 @@ io.on('connection', (socket) => {
 
     socket.on('enter_room', (room) => {
         socket.join(room);
-        console.log(socket.rooms);
+
+        axios.get('http://localhost:8081/api/chats/room/' + room, {
+            room: room
+        }).then((list) => {
+            console.log(list);
+            if(list.data) {
+                socket.emit('init_messages', {messages: list.data})
+            } 
+            console.log(list);
+        }).catch(e => {
+            console.log(e);
+            socket.emit('init_messages', {messages: {}})
+        }) 
     });
 
     socket.on('leave_room', (room) => {
@@ -28,24 +40,13 @@ io.on('connection', (socket) => {
 
     socket.on("chat_message", (msg) => {
 
-        // const message = ChatDataService.create({
-        //     name: msg.name,
-        //     message: msg.message,
-        //     chatroom: msg.room,
-        //     createdAt: msg.date
-        // }).then(() => {
-        //     io.in(msg.room).emit('received_message', msg);
-        // }).catch(e => {
-        //     console.log(e);
-        // });
-
-        axios.post('http://localhost:8081/api/chats', {
+        axios.post('http://localhost:8081/api/chats/', {
             name: msg.name,
             message: msg.message,
-            chatroom: msg.room,
+            chatroom: msg.chatroom,
             createdAt: msg.date
-        }).then(() => {
-            io.in(msg.room).emit('received_message', msg);
+        }).then((response) => {
+            io.in(msg.chatroom).emit('received_message', msg);
         }).catch(e => {
             console.log(e);
         });
